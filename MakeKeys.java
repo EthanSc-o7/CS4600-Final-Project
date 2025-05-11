@@ -3,13 +3,12 @@ import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.util.Base64;
 
 public class MakeKeys {
 
     public static void saveKey(byte[] key, String filename) throws Exception {
         FileOutputStream fos = new FileOutputStream(filename);
-        fos.write(Base64.getEncoder().encode(key));
+        fos.write(key);
         fos.close();
     }
 
