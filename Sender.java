@@ -100,13 +100,27 @@ public class Sender {
 
         byte[] mac = appendMAC(encryptedMessage.encryptMessage, encryptedAES, "mackey");
 
-        transmitData(encryptedMessage.encryptAES);
 
-        transmitData(encryptedAES);
+        //Changed this instead of using transmitData function. This worked better for receiving the data but doesn't have to be used.
+        DataOutputStream writeOut = new DataOutputStream(new FileOutputStream("Sent_data.txt"));
 
-        transmitData(encryptedMessage.encryptMessage);
+        
+        writeOut.writeInt(encryptedAES.length);
+        writeOut.write(encryptedAES);
 
-        transmitData(mac);
+       
+        writeOut.writeInt(encryptedMessage.encryptMessage.length);
+        writeOut.write(encryptedMessage.encryptMessage);
+
+        
+        writeOut.writeInt(encryptedMessage.encryptAES.length); 
+        writeOut.write(encryptedMessage.encryptAES);
+
+        
+        writeOut.writeInt(mac.length);
+        writeOut.write(mac);
+
+    
 
     }
 
