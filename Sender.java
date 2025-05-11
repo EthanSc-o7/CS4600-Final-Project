@@ -24,13 +24,14 @@ public class Sender {
 
     // Append MAC to data transmitted
 
+    // Creates and returns AES secret key
     public static SecretKey createAES() throws NoSuchAlgorithmException {
         KeyGenerator generator = KeyGenerator.getInstance("AES");
         generator.init(128);
         return generator.generateKey();
     }
 
-
+    // Encrypts message using AES CBC
     public static EncryptedMessage encryptMessage(File fileName, SecretKey aesKey) throws Exception{
         byte[] message = Files.readAllBytes(fileName.toPath());
 
@@ -43,11 +44,11 @@ public class Sender {
         IvParameterSpec params = new IvParameterSpec(iv);
 
         cipher.init(Cipher.ENCRYPT_MODE, aesKey, params);
-
+        // Message is encrypted and returned along with iv value
         byte[] encryptedM = cipher.doFinal(message);
         return new EncryptedMessage(encryptedM, iv);
     }
-
+    // Encrypts AES key using receivers public key using RSA ECB
     public static byte[] encryptAES(SecretKey aesKey, PublicKey pubKey) throws Exception{
 
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -55,6 +56,7 @@ public class Sender {
         return cipher.doFinal(aesKey.getEncoded());
     }
 
+    // Creates the MAC using HMAC with SHA 256
     public static byte[] appendMAC(byte[] encryptedMessage, byte[] encryptedAES, String MACKey) throws Exception{
 
         SecretKey macKey = new SecretKeySpec(MACKey.getBytes(), "HmacSHA256");
@@ -67,7 +69,7 @@ public class Sender {
         senderMAC.update(encryptedAES);
         return senderMAC.doFinal();
     }
-
+    //Transmits the data
     public static void transmitData(byte[] data) throws Exception{
         DataOutputStream writeOut = new DataOutputStream(new FileOutputStream("Sent_data.txt"));
 
@@ -83,30 +85,35 @@ public class Sender {
         PublicKey receiverPubKey;
         SecretKey senderSecretKey;
         EncryptedMessage encryptedMessage;
-
+        byte[] encryptedAES;
+        byte[] mac;
+        //Loads the receiver public key and message
         File pubKey = new File("receiver_public.key");
         File message = new File("message.txt");
         byte[] keyBytes = Files.readAllBytes(pubKey.toPath());
         X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-
-
         receiverPubKey = KeyFactory.getInstance("RSA").generatePublic(spec);
 
+        //Makes the AES sender secret key
         senderSecretKey = createAES();
 
+        // Encrypts the message using the AES key and encrypts the AES key with the receivers public key
+        // Then creates the MAC for the encrypted message and the encrypted AES key
         encryptedMessage = encryptMessage(message, senderSecretKey);
+        encryptedAES = encryptAES(senderSecretKey, receiverPubKey);
+        mac = appendMAC(encryptedMessage.encryptMessage, encryptedAES, "mackey");
 
-        byte[] encryptedAES = encryptAES(senderSecretKey, receiverPubKey);
 
-        byte[] mac = appendMAC(encryptedMessage.encryptMessage, encryptedAES, "mackey");
-
-        transmitData(encryptedMessage.encryptAES);
+        //transmits the encrypted message, encrypted aes and mac
+        transmitData(encryptedMessage.encryptIV);
 
         transmitData(encryptedAES);
 
         transmitData(encryptedMessage.encryptMessage);
 
         transmitData(mac);
+
+        System.out.println("Data has been encrypted and transmitted");
 
     }
 
