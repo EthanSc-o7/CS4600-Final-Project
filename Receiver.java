@@ -28,8 +28,8 @@ public class Receiver {
         return new SecretKeySpec(aesKeyBytes, "AES");
     }
 
-    public static boolean verifyMAC(byte[] message, byte[] encryptedAES, byte[] receivedMAC, String macKey) throws Exception {
-        SecretKey macKeyObj = new SecretKeySpec(macKey.getBytes(), "HmacSHA256");
+    public static boolean verifyMAC(byte[] message, byte[] encryptedAES, byte[] receivedMAC, byte[] macKey) throws Exception {
+        SecretKey macKeyObj = new SecretKeySpec(macKey, "HmacSHA256");
         Mac mac = Mac.getInstance("HmacSHA256");
         mac.init(macKeyObj);
         mac.update(message);
@@ -80,7 +80,7 @@ public class Receiver {
             SecretKey aesKey = decryptAESKey(encryptedAES, receiverPrivKey);
 
             // Verify MAC
-            boolean isValid = verifyMAC(encryptedMessage, encryptedAES, mac, "mackey");
+            boolean isValid = verifyMAC(encryptedMessage, encryptedAES, mac, aesKey.getEncoded());
 
             if (!isValid) {
                 System.out.println("MAC verification failed! Message integrity compromised.");

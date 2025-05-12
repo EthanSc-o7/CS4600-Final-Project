@@ -57,9 +57,9 @@ public class Sender {
     }
 
     // Creates the MAC using HMAC with SHA 256
-    public static byte[] appendMAC(byte[] encryptedMessage, byte[] encryptedAES, String MACKey) throws Exception{
+    public static byte[] appendMAC(byte[] encryptedMessage, byte[] encryptedAES, byte[] MACKey) throws Exception{
 
-        SecretKey macKey = new SecretKeySpec(MACKey.getBytes(), "HmacSHA256");
+        SecretKey macKey = new SecretKeySpec(MACKey, "HmacSHA256");
 
         Mac senderMAC = Mac.getInstance("HmacSHA256");
 
@@ -99,7 +99,7 @@ public class Sender {
         // Then creates the MAC for the encrypted message and the encrypted AES key
         encryptedMessage = encryptMessage(message, senderSecretKey);
         encryptedAES = encryptAES(senderSecretKey, receiverPubKey);
-        mac = appendMAC(encryptedMessage.encryptMessage, encryptedAES, "mackey");
+        mac = appendMAC(encryptedMessage.encryptMessage, encryptedAES, senderSecretKey.getEncoded());
 
 
 
