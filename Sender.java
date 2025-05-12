@@ -70,9 +70,7 @@ public class Sender {
         return senderMAC.doFinal();
     }
     //Transmits the data
-    public static void transmitData(byte[] data) throws Exception{
-        DataOutputStream writeOut = new DataOutputStream(new FileOutputStream("Sent_data.txt"));
-
+    public static void transmitData(byte[] data, DataOutputStream writeOut) throws Exception{
         writeOut.writeInt(data.length);
         writeOut.write(data);
     }
@@ -106,25 +104,16 @@ public class Sender {
 
 
 
-        //Changed this instead of using transmitData function. This worked better for receiving the data but doesn't have to be used
-        DataOutputStream writeOut = new DataOutputStream(new FileOutputStream("Sent_data.txt"));
 
-        
-        writeOut.writeInt(encryptedAES.length);
-        writeOut.write(encryptedAES);
-
-       
-        writeOut.writeInt(encryptedMessage.encryptMessage.length);
-        writeOut.write(encryptedMessage.encryptMessage);
-
-        
-        writeOut.writeInt(encryptedMessage.encryptIV.length); 
-        writeOut.write(encryptedMessage.encryptIV);
+        DataOutputStream writeOut = new DataOutputStream(new FileOutputStream("Transmitted_Data.txt"));
 
 
-        
-        writeOut.writeInt(mac.length);
-        writeOut.write(mac);
+
+        transmitData(encryptedAES, writeOut);
+        transmitData(encryptedMessage.encryptMessage,writeOut);
+        transmitData(encryptedMessage.encryptIV,writeOut);
+        transmitData(mac,writeOut);
+
 
     
 

@@ -51,8 +51,8 @@ public class Reciever {
             // Load receiver's private RSA key
             PrivateKey receiverPrivKey = loadPrivateKey("receiver_private.key");
 
-            // Read from Sent_data.txt
-            DataInputStream in = new DataInputStream(new FileInputStream("Sent_data.txt"));
+            // Read from Transmitted_Data.txt
+            DataInputStream in = new DataInputStream(new FileInputStream("Transmitted_Data.txt"));
 
             // Read encrypted AES key
             int aesKeyLen = in.readInt();
