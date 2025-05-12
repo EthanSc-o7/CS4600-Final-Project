@@ -12,7 +12,7 @@ import java.security.PrivateKey;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Arrays;
 
-public class Reciever {
+public class Receiver {
 
     public static PrivateKey loadPrivateKey(String filename) throws Exception {
         byte[] keyBytes = Files.readAllBytes(new File(filename).toPath());
